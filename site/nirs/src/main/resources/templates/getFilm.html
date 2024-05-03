@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en"   xmlns:th = "http://www.thymeleaf.org"
+      xmlns:sec = "http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${film.name}"></title>
+    <link rel="stylesheet" th:href="@{/assets/css/getBasicStyle.css}" href="../static/assets/css/getBasicStyle.css">
+    <link rel="stylesheet" th:href="@{/assets/css/a.css}" href="../static/assets/css/a.css">
+    <link rel="stylesheet" th:href="@{/assets/css/footer.css}" href="../static/assets/css/footer.css">
+    <link rel="stylesheet" th:href="@{/assets/css/header.css}" href="../static/assets/css/header.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+</head>
+
+
+
+
+
+
+<header>
+    <div id="menuHolder">
+        <div role="navigation" class="sticky-top border-bottom border-top" id="mainNavigation">
+            <div class="flexMain">
+                <div class="flex2">
+                    <button class="whiteLink siteLink" style="border-right:1px solid #eaeaea" onclick="menuToggle()"><i class="fas fa-bars me-2"></i> MENU</button>
+                </div>
+                <div class="flex3 text-center" id="siteBrand" th:text="KinoGo" >
+                    KinoGo
+                </div>
+
+                <div class="flex2 text-end d-block d-md-none">
+                    <button class="whiteLink siteLink"><i class="fas fa-search"></i></button>
+                </div>
+
+                <div class="flex2 text-end d-none d-md-block">
+                    <button sec:authorize="!isAuthenticated()" type="button" onclick="location.href='/register';" class="whiteLink siteLink">REGISTER</button>
+                    <button sec:authorize="!isAuthenticated()"  type="button" onclick="location.href='/login';" class="blackLink siteLink">Login</button>
+                    <button sec:authorize="isAuthenticated()"  type="button" class="blackLink siteLink" th:onclick="|location.href='/user/get/${currentUserId}';|"><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M5 21C5 17.134 8.13401 14 12 14C15.866 14 19 17.134 19 21M16 7C16 9.20914 14.2091 11 12 11C9.79086 11 8 9.20914 8 7C8 4.79086 9.79086 3 12 3C14.2091 3 16 4.79086 16 7Z" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg></button>
+                </div>
+            </div>
+        </div>
+
+        <div id="menuDrawer">
+            <div class="p-4 border-bottom">
+                <div class='row'>
+                    <div class="col text-end ">
+                        <i class="fas fa-times" role="btn" onclick="menuToggle()"></i>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <a href="/" class="nav-menu-item"><i class="fas fa-home me-3"></i>Главная страница</a>
+                <a href="/film/all" class="nav-menu-item"><i class="fab fa-product-hunt me-3"></i>Фильмы</a>
+                <a href="/cinema/all" class="nav-menu-item"><i class="fas fa-search me-3"></i>Кинотеатры</a>
+                <a href="/admin/menu"  sec:authorize="hasAuthority('WORKER')" class="nav-menu-item"><i class="fas fa-dollar-sign me-3"></i>Меню администрации</a>
+            </div>
+        </div>
+    </div>
+</header>
+
+
+<script>
+    var menuHolder = document.getElementById('menuHolder')
+var siteBrand = document.getElementById('siteBrand')
+function menuToggle(){
+  if(menuHolder.className === "drawMenu") menuHolder.className = ""
+  else menuHolder.className = "drawMenu"
+}
+</script>
+
+
+
+
+<body>
+
+<div class="main-container">
+    <div class="bg-img">
+        <div id="header">
+            <h1 th:text="${film.name}"></h1>
+        </div>
+
+        <div class="content-container">
+            <div class="block">
+                <div class="photo-block">
+                    <div class="gallery-container">
+
+                            <div style="width:100vw; height:auto; padding: 15px; display:flex; justify-contend:space-around;">
+                                <iframe style="height:200px; width:auto; margin: 10px;"
+                                        th:src="${film.videoTrailer}"
+                                        allowfullscreen ></iframe>
+                                <img  th:src="${img}" style="height:200px; width:auto; margin: 10px;" th:each="img: ${film.images}">
+                            </div>
+
+                    </div>
+                </div>
+
+            </div>
+            <div  class="block">
+                <div class="info-block">
+                    <p th:text="${film.genre.name}" style="white-space: pre-line"></p>
+                    <p style="white-space: pre-line" th:text="${film.releaseDate.toString().substring(0,film.releaseDate.toString().length()-11)}"></p>
+                    <p th:text="${film.shortInfo}" style="white-space: pre-line"></p>
+                </div>
+            </div>
+        </div>
+        <div class="header2">
+            <br>
+        </div>
+        <p th:text="${film.fullInfo}" style="word-break: break-word; padding: 5px"></p>
+    </div>
+    <div class="header2">
+        <br>
+    </div>
+    <p style="text-align: center">Расписание сеансов</p>
+    <div class="content-container">
+        <div id="table-block">
+            <table id="sessionTable" class="tbl-color">
+                <tr>
+                    <td>Название кинотеатра</td>
+                    <td>Название зала</td>
+                    <td>Тип фильма</td>
+                    <td>Начало сеанса</td>
+                    <td>Длительность сеанса</td>
+                    <td>Стоимость билета</td>
+                    <td>Количество свободных мест</td>
+                    <td></td>
+                </tr>
+                <th:block th:each="cinema : ${cinemas}">
+                    <th:block th:each="hall : ${cinema.halls}" th:if="${cinema.name!=DEFAULT_CINEMA}">
+                        <th:block th:each="session_data : ${hall.sessionSet}">
+                            <tr th:if="${session_data.film.id == film.id}">
+                                <td>
+                                    <a th:href="'/hall/get/'+${cinema.id}" th:text="${cinema.name}"></a>
+                                </td>
+                                <td>
+                                    <a th:href="'/hall/get/'+${hall.id}" th:text="${hall.name}"></a>
+                                </td>
+                                <td th:text="${session_data.filmType}"></td>
+                                <td th:text="${session_data.startTime.toString().substring(0,session_data.startTime.toString().length()-2)}"></td>
+                                <td>
+                                    <span th:text="(${session_data.duration} - ${session_data.duration}%60 )/60"></span>    ч <span th:text="${session_data.duration}%60"></span> м
+                                </td>
+                                <td th:text="${session_data.costOfOneTicket}"></td>
+                                <td th:text="${hall.rows} * ${hall.seatsInRow} - ${session_data.tickets.size()} "></td>
+                                <td>
+                                    <button  sec:authorize="isAuthenticated()"  th:onclick="|location.href='/ticket/buy/${session_data.id}';|">Купить</button>
+                                </td>
+                            </tr>
+                        </th:block>
+                    </th:block>
+                </th:block>
+            </table>
+        </div>
+        <div id="search-block">
+            <p>Тип фильма</p>
+            <select id="filmType">
+                <option selected="selected">3D</option>
+                <option>2D</option>
+                <option>iMax</option>
+            </select>
+            <div class="createAccount_inner">
+                <div class="form_label">
+                    <div class="multiselect_block">
+                        <label for="halls" class="field_multiselect">Название зала</label>
+                        <input id="checkbox-1" class="multiselect_checkbox" type="checkbox">
+                        <label for="checkbox-1" class="multiselect_label"></label>
+                        <select  class="field_select" name="technology" multiple style="@media (min-width: 768px) { height: calc(4 * 38px)}" id="halls">
+                            <optgroup th:each="cinema: ${cinemas}" th:label="${cinema.name}" th:if="${cinema.name !='DEFAULT_CINEMA'}">
+                                <option th:each = "hall : ${cinema.halls}" th:text="${hall.name}" ></option>
+                            </optgroup>
+                        </select>
+                    </div>
+                    <span class="error_text"></span>
+                </div>
+            </div>
+            <p>Диапазон цен за билет</p>
+            <input id="minCost" type="number" min="0" placeholder="от" onkeydown="if(event.key==='.' || event.key===',' || event.key==='+'  || event.key==='-'  || event.key==='e'){event.preventDefault();}" onpaste="let pasteData = event.clipboardData.getData('text'); if(pasteData){pasteData.replace(/[^0-9]*/g,'');} ">
+            <input id="maxCost" type="number" min="0" placeholder="до" onkeydown="if(event.key==='.' || event.key===',' || event.key==='+'  || event.key==='-'  || event.key==='e'){event.preventDefault();}" onpaste="let pasteData = event.clipboardData.getData('text'); if(pasteData){pasteData.replace(/[^0-9]*/g,'');}" >
+            <br>
+            <p>Дата сеанса</p>
+            <input type="date" id="sessionDate">
+            <br>
+            <button onclick="filterClick()">Поиск</button>
+        </div>
+    </div>
+    <button  sec:authorize="hasAuthority('WORKER')"  th:onclick="|location.href='/film/update/${film.id}';|"style="margin-top:40px">Изменить</button>
+</div>
+
+<script>
+    ///////////// Multiselect field
+
+    let multiselect_block = document.querySelectorAll(".multiselect_block");
+    multiselect_block.forEach(parent => {
+        let label = parent.querySelector(".field_multiselect");
+        let select = parent.querySelector(".field_select");
+        let text = label.innerHTML;
+        select.addEventListener("change", function(element) {
+            let selectedOptions = this.selectedOptions;
+            label.innerHTML = "";
+            for (let option of selectedOptions) {
+                let button = document.createElement("button");
+                button.type = "button";
+                button.className = "btn_multiselect";
+                button.textContent = option.value;
+                button.onclick = _ => {
+                    option.selected = false;
+                    button.remove();
+                    if (!select.selectedOptions.length) label.innerHTML = text
+                };
+                label.append(button);
+            }
+        })
+    })
+
+</script>
+
+
+
+
+<script>
+    function filterClick() {
+        var minCost = document.getElementById("minCost").value;
+        var maxCost = document.getElementById("maxCost").value;
+        var sessionDate = document.getElementById("sessionDate").value;
+        var filmType = document.getElementById("filmType").options[document.getElementById("filmType").selectedIndex].text;
+        var halls = document.getElementById("halls");
+        const hallSSelected= [];
+
+         for (const option of halls.options) {
+           if (option.selected) {
+                hallSSelected.push(option.text);
+                hallSSelected.push(option.parentElement.label);
+           }
+         }
+     table = document.getElementById("sessionTable");
+     tr = table.getElementsByTagName("tr");
+     for (i = 1; i < tr.length; i++) {
+          td = tr[i].getElementsByTagName("td");
+            tr[i].style.display = ''
+          if (minCost=='' || maxCost==''){}
+          else {
+               if(parseInt(td[5].innerHTML) > parseInt(maxCost) || parseInt(td[5].innerHTML) < parseInt(minCost)) {tr[i].style.display = "none"}
+          }
+          if (td[2].innerHTML != filmType) {tr[i].style.display = "none"}
+          if (sessionDate!='' && sessionDate!= td[3].innerHTML.substring(0,td[3].innerHTML.length - 9 )) {tr[i].style.display = "none"}
+
+            var finded = 0
+            for (let i = 0; i < hallSSelected.length; i = i+2) {
+                 if (td[1].getElementsByTagName("a")[0].innerHTML ==  hallSSelected[i] && td[0].getElementsByTagName("a")[0].innerHTML==  hallSSelected[i+1]){
+                 finded =finded  +1;}
+            }
+            if (hallSSelected.length != 0 && finded == 0){
+             tr[i].style.display = "none"}
+      }
+   }
+</script>
+
+<script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+<script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+
+</body>
+<footer class="footer">
+    <div class="waves">
+        <div class="wave" id="wave1"></div>
+        <div class="wave" id="wave2"></div>
+        <div class="wave" id="wave3"></div>
+        <div class="wave" id="wave4"></div>
+    </div>
+    <ul class="social-icon">
+        <li class="social-icon__item"><a class="social-icon__link" href="#">
+            <ion-icon name="logo-facebook"></ion-icon>
+        </a></li>
+        <li class="social-icon__item"><a class="social-icon__link" href="#">
+            <ion-icon name="logo-twitter"></ion-icon>
+        </a></li>
+        <li class="social-icon__item"><a class="social-icon__link" href="#">
+            <ion-icon name="logo-linkedin"></ion-icon>
+        </a></li>
+        <li class="social-icon__item"><a class="social-icon__link" href="#">
+            <ion-icon name="logo-instagram"></ion-icon>
+        </a></li>
+    </ul>
+    <ul class="menu">
+        <li class="menu__item"><a class="menu__link" href="/">Главная страница</a></li>
+
+    </ul>
+    <p>&copy;2024 KinoGo | All Rights Reserved</p>
+</footer>
+</html>

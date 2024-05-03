@@ -1,0 +1,9 @@
+.table-select{
+color: #ffffff;
+border: 1px solid #ffffff;
+word-break: break-all; word-wrap: break-word;
+}
+
+table{
+width:100%;
+}

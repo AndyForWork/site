@@ -1,0 +1,52 @@
+.workShift{
+border:3px solid black;
+height :300px;
+overflow-y:auto;
+}
+
+td{
+
+width: auto
+}
+
+p{
+border:1px solid white;
+}
+
+a.fill-div {
+    display: block;
+    height: 100%;
+    width: 100%;
+    text-decoration: none;
+}
+
+.table-workshifts-div{
+
+      display: flex;
+      flex-wrap: nowrap;
+}
+.time-div{
+
+width:4%;
+}
+
+.table-field{
+width:90%;
+}
+
+.time{
+
+    display: block;
+    height: 100%;
+    width: 100%;
+    text-decoration: none;
+}
+
+.time-field{
+height :300px;
+}
+
+table{
+table-layout: fixed;
+    width: 100%;
+    }

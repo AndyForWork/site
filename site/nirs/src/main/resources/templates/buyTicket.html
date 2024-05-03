@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en"   xmlns:th = "http://www.thymeleaf.org"
+      xmlns:sec = "http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
+<head>
+    <meta charset="UTF-8">
+    <title>Покупка билета</title>
+    <link rel="stylesheet" th:href="@{/assets/css/buyTicket.css}" href="../static/assets/css/buyTicket.css">
+    <link rel="stylesheet" th:href="@{/assets/css/getBasicStyle.css}" href="../static/assets/css/getBasicStyle.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <link rel="stylesheet" th:href="@{/assets/css/footer.css}" href="../static/assets/css/footer.css">
+    <link rel="stylesheet" th:href="@{/assets/css/header.css}" href="../static/assets/css/header.css">
+</head>
+
+
+
+<header>
+    <div id="menuHolder">
+        <div role="navigation" class="sticky-top border-bottom border-top" id="mainNavigation">
+            <div class="flexMain">
+                <div class="flex2">
+                    <button class="whiteLink siteLink" style="border-right:1px solid #eaeaea" onclick="menuToggle()"><i class="fas fa-bars me-2"></i> MENU</button>
+                </div>
+                <div class="flex3 text-center" id="siteBrand" th:text="KinoGo" >
+                    KinoGo
+                </div>
+
+                <div class="flex2 text-end d-block d-md-none">
+                    <button class="whiteLink siteLink"><i class="fas fa-search"></i></button>
+                </div>
+
+                <div class="flex2 text-end d-none d-md-block">
+                    <button sec:authorize="!isAuthenticated()" type="button" onclick="location.href='/register';" class="whiteLink siteLink">REGISTER</button>
+                    <button sec:authorize="!isAuthenticated()"  type="button" onclick="location.href='/login';" class="blackLink siteLink">Login</button>
+                    <button sec:authorize="isAuthenticated()"  type="button" class="blackLink siteLink" th:onclick="|location.href='/user/get/${currentUserId}';|"><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M5 21C5 17.134 8.13401 14 12 14C15.866 14 19 17.134 19 21M16 7C16 9.20914 14.2091 11 12 11C9.79086 11 8 9.20914 8 7C8 4.79086 9.79086 3 12 3C14.2091 3 16 4.79086 16 7Z" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg></button>
+                </div>
+            </div>
+        </div>
+
+        <div id="menuDrawer">
+            <div class="p-4 border-bottom">
+                <div class='row'>
+                    <div class="col text-end ">
+                        <i class="fas fa-times" role="btn" onclick="menuToggle()"></i>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <a href="/" class="nav-menu-item"><i class="fas fa-home me-3"></i>Главная страница</a>
+                <a href="/film/all" class="nav-menu-item"><i class="fab fa-product-hunt me-3"></i>Фильмы</a>
+                <a href="/cinema/all" class="nav-menu-item"><i class="fas fa-search me-3"></i>Кинотеатры</a>
+                <a href="/admin/menu"  sec:authorize="hasAuthority('WORKER')" class="nav-menu-item"><i class="fas fa-dollar-sign me-3"></i>Меню администрации</a>
+            </div>
+        </div>
+    </div>
+</header>
+
+
+<script>
+    var menuHolder = document.getElementById('menuHolder')
+var siteBrand = document.getElementById('siteBrand')
+function menuToggle(){
+  if(menuHolder.className === "drawMenu") menuHolder.className = ""
+  else menuHolder.className = "drawMenu"
+}
+</script>
+
+
+
+
+
+<body>
+<p th:text = "${user.balance}" th:value = "${user.balance}" style="display: none" id="balance"></p>
+
+<div class="main-container">
+    <div class="content-container">
+        <div id="table-block">
+            <table>
+                <tr>
+                    <td></td>
+                    <td th:each="j : ${#numbers.sequence( 0, selected_session.hall.seatsInRow-1,1)}" th:text="${j+1}" style="text-align: center;"></td>
+                </tr>
+                <tr th:each="i : ${#numbers.sequence( 0, selected_session.hall.rows-1,1)}">
+                    <td th:text="${i+1}"></td>
+                    <td th:each="j : ${#numbers.sequence( 0, selected_session.hall.seatsInRow-1,1)}">
+                        <div style="border: 1px solid black; width: 100%; height: 100%">
+                            <label th:style="${selected_session.checkExistTicketByRowAndSeat(i+1,j+1) ? 'display:block; ' : 'display:none;'}">
+                                <input type="checkbox" name="" value="" onclick="return false" style="display: none" />
+                                <div style="width:100px;">
+                                    <svg  viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M11 14C7.13401 14 4 17.134 4 21H11M14.8086 19.7053L19.127 16.3467M15 7C15 9.20914 13.2091 11 11 11C8.79086 11 7 9.20914 7 7C7 4.79086 8.79086 3 11 3C13.2091 3 15 4.79086 15 7ZM20 18C20 19.6569 18.6569 21 17 21C15.3431 21 14 19.6569 14 18C14 16.3431 15.3431 15 17 15C18.6569 15 20 16.3431 20 18Z" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>
+                                </div>
+                            </label>
+                            <label th:style="${!selected_session.checkExistTicketByRowAndSeat(i+1,j+1) ? 'display:block; ' : 'display:none;'}">
+                                <input type="checkbox"  class="checkbox-of-img" onchange="Check(this)" th:id="${i+1} + ','+${j+1}" style="display: none"/>
+                                <div style="width:100px;">
+                                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g> <path th:id="'svg-'+${i+1} + ','+${j+1}"  d="M5 21C5 17.134 8.13401 14 12 14C15.866 14 19 17.134 19 21M16 7C16 9.20914 14.2091 11 12 11C9.79086 11 8 9.20914 8 7C8 4.79086 9.79086 3 12 3C14.2091 3 16 4.79086 16 7Z" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>       </label>
+                               </div>
+                           </td>
+                </tr>
+            </table>
+
+        </div>
+        <div id="search-block">
+        <p>Стоимость одного билета</p>
+        <p id="costOfOne" th:text="${selected_session.costOfOneTicket}"></p>
+        <p>Выбрано мест</p>
+        <p id="count">0</p>
+        <p>Суммарная стоимость</p>
+        <p id="totalCost">0</p>
+        <form method="post">
+            <input type="hidden" id="res" th:name="places">
+            <button type="button" onclick="getRes()" id="resBtn">Купить</button>
+        </form>
+            <p style="color: red; display:none" id="alert">Недостаточно средств для покупки, пожалуйста пополните баланс в личном кабинете!</p>
+        </div>
+    </div>
+</div>
+
+
+
+
+<script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+<script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+
+
+<footer class="footer">
+    <div class="waves">
+        <div class="wave" id="wave1"></div>
+        <div class="wave" id="wave2"></div>
+        <div class="wave" id="wave3"></div>
+        <div class="wave" id="wave4"></div>
+    </div>
+    <ul class="social-icon">
+        <li class="social-icon__item"><a class="social-icon__link" href="#">
+            <ion-icon name="logo-facebook"></ion-icon>
+        </a></li>
+        <li class="social-icon__item"><a class="social-icon__link" href="#">
+            <ion-icon name="logo-twitter"></ion-icon>
+        </a></li>
+        <li class="social-icon__item"><a class="social-icon__link" href="#">
+            <ion-icon name="logo-linkedin"></ion-icon>
+        </a></li>
+        <li class="social-icon__item"><a class="social-icon__link" href="#">
+            <ion-icon name="logo-instagram"></ion-icon>
+        </a></li>
+    </ul>
+    <ul class="menu">
+        <li class="menu__item"><a class="menu__link" href="/">Главная страница</a></li>
+
+    </ul>
+    <p>&copy;2024 KinoGo | All Rights Reserved</p>
+</footer>
+
+</body>
+
+
+<script>
+        function Check(data){
+        console.log(data.id);
+        var str = "svg-" + data.id;
+        var svg = document.getElementById(str);
+        var costOfOne= document.getElementById("costOfOne");
+        var count = document.getElementById("count");
+        var totalCost = document.getElementById("totalCost");
+        console.log( costOfOne.innerText);
+        console.log(count.innerText);
+        console.log(totalCost.innerText );
+        if (data.checked == true){
+            count.innerText = parseInt(count.innerText ) + 1;
+            totalCost.innerText = parseInt(count.innerText ) *  parseInt(costOfOne.innerText)
+            svg.setAttribute('d',"M14.9999 15.2547C13.8661 14.4638 12.4872 14 10.9999 14C7.40399 14 4.44136 16.7114 4.04498 20.2013C4.01693 20.4483 4.0029 20.5718 4.05221 20.6911C4.09256 20.7886 4.1799 20.8864 4.2723 20.9375C4.38522 21 4.52346 21 4.79992 21H9.94465M13.9999 19.2857L15.7999 21L19.9999 17M14.9999 7C14.9999 9.20914 13.2091 11 10.9999 11C8.79078 11 6.99992 9.20914 6.99992 7C6.99992 4.79086 8.79078 3 10.9999 3C13.2091 3 14.9999 4.79086 14.9999 7Z");
+        }
+        else{
+            count.innerText = parseInt(count.innerText ) - 1;
+            totalCost.innerText = parseInt(count.innerText ) *  parseInt(costOfOne.innerText)
+            svg.setAttribute('d',"M5 21C5 17.134 8.13401 14 12 14C15.866 14 19 17.134 19 21M16 7C16 9.20914 14.2091 11 12 11C9.79086 11 8 9.20914 8 7C8 4.79086 9.79086 3 12 3C14.2091 3 16 4.79086 16 7Z");
+        }
+}
+</script>
+<script>
+    function getRes(){
+        console.log("gettingRes");
+        var resField = document.getElementById("res");
+        var resBtn = document.getElementById("resBtn");
+        var balance = document.getElementById("balance");
+        var totalCost = document.getElementById("totalCost");
+        var str = "";
+        var checkboxOfImg = document.getElementsByClassName("checkbox-of-img");
+        for(i = 0;i<checkboxOfImg.length; i = i +1){
+            if (checkboxOfImg[i].checked == true)
+                str = str+checkboxOfImg[i].id.trim() + ',';
+        }
+        resField.value = str.substring(0, str.length - 1);
+        console.log(balance.innerText)
+        console.log(balance)
+        if (parseInt(balance.innerText)<parseInt(totalCost.innerText)){
+            var alert =  document.getElementById("alert");
+            alert.style.display = "";
+            console.log("Средств недостаточно");
+        }
+        else{
+            console.log("Средств достаточно");
+            resBtn.setAttribute('type','submit');
+        }
+    }
+</script>
+</html>

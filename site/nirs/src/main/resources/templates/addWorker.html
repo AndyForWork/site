@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en"   xmlns:th = "http://www.thymeleaf.org"
+      xmlns:sec = "http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
+<head>
+    <meta charset="UTF-8">
+    <title>Добавить работника</title>
+    <link rel="stylesheet" th:href="@{/assets/css/getBasicStyle.css}" href="../static/assets/css/getBasicStyle.css">
+    <link rel="stylesheet" th:href="@{/assets/css/a.css}" href="../static/assets/css/a.css">
+    <link rel="stylesheet" th:href="@{/assets/css/footer.css}" href="../static/assets/css/footer.css">
+    <link rel="stylesheet" th:href="@{/assets/css/header.css}" href="../static/assets/css/header.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+</head>
+
+
+
+
+
+
+<header>
+    <div id="menuHolder">
+        <div role="navigation" class="sticky-top border-bottom border-top" id="mainNavigation">
+            <div class="flexMain">
+                <div class="flex2">
+                    <button class="whiteLink siteLink" style="border-right:1px solid #eaeaea" onclick="menuToggle()"><i class="fas fa-bars me-2"></i> MENU</button>
+                </div>
+                <div class="flex3 text-center" id="siteBrand" th:text="KinoGo" >
+                    KinoGo
+                </div>
+
+                <div class="flex2 text-end d-block d-md-none">
+                    <button class="whiteLink siteLink"><i class="fas fa-search"></i></button>
+                </div>
+
+                <div class="flex2 text-end d-none d-md-block">
+                    <button sec:authorize="!isAuthenticated()" type="button" onclick="location.href='/register';" class="whiteLink siteLink">REGISTER</button>
+                    <button sec:authorize="!isAuthenticated()"  type="button" onclick="location.href='/login';" class="blackLink siteLink">Login</button>
+                    <button sec:authorize="isAuthenticated()"  type="button" class="blackLink siteLink" th:onclick="|location.href='/user/get/${currentUserId}';|"><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M5 21C5 17.134 8.13401 14 12 14C15.866 14 19 17.134 19 21M16 7C16 9.20914 14.2091 11 12 11C9.79086 11 8 9.20914 8 7C8 4.79086 9.79086 3 12 3C14.2091 3 16 4.79086 16 7Z" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg></button>
+                </div>
+            </div>
+        </div>
+
+        <div id="menuDrawer">
+            <div class="p-4 border-bottom">
+                <div class='row'>
+                    <div class="col text-end ">
+                        <i class="fas fa-times" role="btn" onclick="menuToggle()"></i>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <a href="/" class="nav-menu-item"><i class="fas fa-home me-3"></i>Главная страница</a>
+                <a href="/film/all" class="nav-menu-item"><i class="fab fa-product-hunt me-3"></i>Фильмы</a>
+                <a href="/cinema/all" class="nav-menu-item"><i class="fas fa-search me-3"></i>Кинотеатры</a>
+                <a href="/admin/menu"  sec:authorize="hasAuthority('WORKER')" class="nav-menu-item"><i class="fas fa-dollar-sign me-3"></i>Меню администрации</a>
+            </div>
+        </div>
+    </div>
+</header>
+
+
+<script>
+    var menuHolder = document.getElementById('menuHolder')
+var siteBrand = document.getElementById('siteBrand')
+function menuToggle(){
+  if(menuHolder.className === "drawMenu") menuHolder.className = ""
+  else menuHolder.className = "drawMenu"
+}
+</script>
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.6/js/standalone/selectize.min.js" integrity="sha256-+C0A5Ilqmu4QcSPxrlGpaZxJ04VjsRjKu+G82kl5UJk=" crossorigin="anonymous"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.6/css/selectize.bootstrap3.min.css" integrity="sha256-ze/OEYGcFbPRmvCnrSeKbRTtjG4vGLHXgOqsyLFTRjg=" crossorigin="anonymous" />
+
+<body>
+
+<div class="main-container" style="color: #FFFFFF; text-align: center;">
+<form method="post">
+    <p>Логин пользователя, который станет работником</p>
+    <h3 style="color: red; display: none" id="userError">Поле не должно быть пустым !</h3>
+    <select  th:name="id" id="user">
+        <option th:each="user : ${users}" th:text="${user.username}" th:value="${user.userId}" >
+    </select>
+<p>Имя</p>
+    <h3 style="color: red; display: none" id="firstNameError">Поле не должно быть пустым !</h3>
+    <h3 style="color: red; display: none" id="firstNameSymbolError">Поле не должно содержать цифры и знаки !</h3>
+    <input type="text" th:name="firstName" id="firstName">
+<p>Фамилия</p>
+    <h3 style="color: red; display: none" id="secondNameError">Поле не должно быть пустым !</h3>
+    <h3 style="color: red; display: none" id="secondNameSymbolError">Поле не должно содержать цифры и знаки !</h3>
+    <input type="text" th:name="secondName" id="secondName">
+    <p>Отчество</p>
+    <h3 style="color: red; display: none" id="surnameSymbolError">Поле не должно содержать цифры и знаки !</h3>
+    <input type="text" th:name="surname" id="surname">
+    <p>Пол</p>
+    <h3 style="color: red; display: none" id="genderError">Поле не должно быть пустым !</h3>
+    <select th:name="gender" id="gender">
+        <option th:value="Мужчина" selected="true">Мужчина</option>
+        <option th:value="Женщина" >Женщина</option>
+    </select>
+    <p>Дата рождения</p>
+    <h3 style="color: red; display: none" id="dateOfBirthError">Поле не должно быть пустым !</h3>
+    <input type="date" th:name="dateOfBirth" id="dateOfBirth">
+<p>Номер телефона (пример: +12223334455)</p>
+    <h3 style="color: red; display: none" id="phoneError">Поле не должно быть пустым !</h3>
+    <input type="tel" th:name="phone" id="phone" pattern="[+]{1}[0-9]{11,14}" required>
+    <p>Почта</p>
+    <h3 style="color: red; display: none" id="emailError">Поле не должно быть пустым !</h3>
+    <input type="email" th:name="email" id="email">
+    <p>Место работы</p>
+    <h3 style="color: red; display: none" id="workPlaceError">Поле не должно быть пустым !</h3>
+    <select th:name="workPlace" id="workPlace">
+        <option th:each="cinema : ${cinemas}"  th:text="${cinema.name}" th:value="${cinema.id}">
+    </select>
+    <p>Позиция</p>
+    <h3 style="color: red; display: none" id="positionError">Поле не должно быть пустым !</h3>
+    <input type="text" th:name="position" id="position">
+    <p>Заработная плата</p>
+    <h3 style="color: red; display: none" id="salaryError">Поле не должно быть пустым !</h3>
+    <h3 style="color: red; display: none" id="salaryErrorZero">Значение должно быть отличным от 0!</h3>
+    <input  type="number" th:name="salary" id="salary"  value="1" min="1" onkeydown="if(event.key==='.' || event.key===',' || event.key==='+'  || event.key==='-'  || event.key==='e'){event.preventDefault();}" onpaste="let pasteData = event.clipboardData.getData('text'); if(pasteData){pasteData.replace(/[^0-9]*/g,'');} ">
+
+    <br>
+
+    <button type="submit" onclick="checkData()"  id="resBtn"> ок</button>
+</form>
+</div>
+
+<script>
+    function onlyLetters(str) {
+        return /^[A-Za-zА-Яа-я]*$/.test(str);
+    }
+
+    function checkData(){
+
+
+        var userError = document.getElementById('userError');
+        var user = document.getElementById('user');
+        var firstNameError = document.getElementById('firstNameError');
+        var firstNameSymbolError = document.getElementById('firstNameSymbolError');
+        var firstName = document.getElementById('firstName');
+        var secondNameError = document.getElementById('secondNameError');
+        var secondNameSymbolError = document.getElementById('secondNameSymbolError');
+        var secondName = document.getElementById('secondName');
+        var surnameSymbolError = document.getElementById('surnameSymbolError');
+        var surname = document.getElementById('surname');
+        var genderError = document.getElementById('genderError');
+        var gender = document.getElementById('gender');
+        var dateOfBirthError = document.getElementById('dateOfBirthError');
+        var dateOfBirth = document.getElementById('dateOfBirth');
+        var phoneError = document.getElementById('phoneError');
+        var phone = document.getElementById('phone');
+        var emailError = document.getElementById('emailError');
+        var email = document.getElementById('email');
+        var workPlaceError = document.getElementById('workPlaceError');
+        var workPlace = document.getElementById('workPlace');
+        var positionError = document.getElementById('positionError');
+        var position = document.getElementById('position');
+        var salaryError = document.getElementById('salaryError');
+        var salaryErrorZero = document.getElementById('salaryErrorZero');
+        var salary = document.getElementById('salary');
+
+
+        const resBtn = document.getElementById('resBtn');
+
+
+         userError.style.display = "none";
+         firstNameError.style.display = "none";
+         firstNameSymbolError.style.display = "none";
+         secondNameError.style.display = "none";
+         secondNameSymbolError.style.display = "none";
+         surnameSymbolError.style.display = "none";
+         genderError.style.display = "none";
+         dateOfBirthError.style.display = "none";
+         phoneError.style.display = "none";
+         emailError.style.display = "none";
+         positionError.style.display = "none";
+         salaryError.style.display = "none";
+         salaryErrorZero.style.display = "none";
+
+
+        var fail = 0;
+        if ( user.value==""){
+           userError.style.display = "";
+           fail = 1;
+        }
+
+        if ( firstName.value==""){
+           firstNameError.style.display = "";
+           fail = 1;
+        }
+        if ( !onlyLetters(firstName.value)){
+           firstNameSymbolError.style.display = "";
+           fail = 1;
+        }
+
+        if ( secondName.value==""){
+           secondNameError.style.display = "";
+           fail = 1;
+        }
+        if ( !onlyLetters(secondName.value)){
+           secondNameSymbolError.style.display = "";
+           fail = 1;
+        }
+
+        if ( !onlyLetters(surname.value)){
+           surnameSymbolError.style.display = "";
+           fail = 1;
+        }
+
+        if ( gender.options[gender.selectedIndex].text==""){
+           genderError.style.display = "";
+           fail = 1;
+        }
+
+        if ( dateOfBirth.value==""){
+           dateOfBirthError.style.display = "";
+           fail = 1;
+        }
+
+        if ( phone.value==""){
+           phoneError.style.display = "";
+           fail = 1;
+        }
+
+        if ( email.value==""){
+           emailError.style.display = "";
+           fail = 1;
+        }
+
+        if ( workPlace.value==""){
+           workPlaceError.style.display = "";
+           fail = 1;
+        }
+
+
+        if ( position.value==""){
+           positionError.style.display = "";
+           fail = 1;
+        }
+
+        if ( salary.value==""){
+           salaryError.style.display = "";
+           fail = 1;
+        }
+
+        if ( position.value < 1 ){
+           salaryErrorZero.style.display = "";
+           fail = 1;
+        }
+
+         if (fail == 1){
+            resBtn.setAttribute('type','button');
+         }
+         else{
+            resBtn.setAttribute('type','submit');
+        }
+
+
+    }
+</script>
+
+
+<script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+<script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+
+
+<footer class="footer">
+    <div class="waves">
+        <div class="wave" id="wave1"></div>
+        <div class="wave" id="wave2"></div>
+        <div class="wave" id="wave3"></div>
+        <div class="wave" id="wave4"></div>
+    </div>
+    <ul class="social-icon">
+        <li class="social-icon__item"><a class="social-icon__link" href="#">
+            <ion-icon name="logo-facebook"></ion-icon>
+        </a></li>
+        <li class="social-icon__item"><a class="social-icon__link" href="#">
+            <ion-icon name="logo-twitter"></ion-icon>
+        </a></li>
+        <li class="social-icon__item"><a class="social-icon__link" href="#">
+            <ion-icon name="logo-linkedin"></ion-icon>
+        </a></li>
+        <li class="social-icon__item"><a class="social-icon__link" href="#">
+            <ion-icon name="logo-instagram"></ion-icon>
+        </a></li>
+    </ul>
+    <ul class="menu">
+        <li class="menu__item"><a class="menu__link" href="/">Главная страница</a></li>
+
+    </ul>
+    <p>&copy;2024 KinoGo | All Rights Reserved</p>
+</footer>
+</body>
+</html>

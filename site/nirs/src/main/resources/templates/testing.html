@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>Редактирование смены</title>
+    <link rel="stylesheet" th:href="@{/assets/css/getBasicStyle.css}" href="../static/assets/css/getBasicStyle.css">
+    <link rel="stylesheet" th:href="@{/assets/css/dropdownBtn.css}" href="../static/assets/css/dropdownBtn.css">
+    <link rel="stylesheet" th:href="@{/assets/css/a.css}" href="../static/assets/css/a.css">
+    <link rel="stylesheet" th:href="@{/assets/css/footer.css}" href="../static/assets/css/footer.css">
+    <link rel="stylesheet" th:href="@{/assets/css/header.css}" href="../static/assets/css/header.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+</head>
+
+
+
+
+
+
+<header>
+    <div id="menuHolder">
+        <div role="navigation" class="sticky-top border-bottom border-top" id="mainNavigation">
+            <div class="flexMain">
+                <div class="flex2">
+                    <button class="whiteLink siteLink" style="border-right:1px solid #eaeaea" onclick="menuToggle()"><i class="fas fa-bars me-2"></i> MENU</button>
+                </div>
+                <div class="flex3 text-center" id="siteBrand">
+                    KinoGo
+                </div>
+
+                <div class="flex2 text-end d-block d-md-none">
+                    <button class="whiteLink siteLink"><i class="fas fa-search"></i></button>
+                </div>
+
+                <div class="flex2 text-end d-none d-md-block">
+                    <button class="whiteLink siteLink">REGISTER</button>
+                    <button class="blackLink siteLink">Login</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="menuDrawer">
+            <div class="p-4 border-bottom">
+                <div class='row'>
+                    <div class="col text-end ">
+                        <i class="fas fa-times" role="btn" onclick="menuToggle()"></i>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <a href="#" class="nav-menu-item"><i class="fas fa-home me-3"></i>Главная страница</a>
+                <a href="#" class="nav-menu-item"><i class="fab fa-product-hunt me-3"></i>Фильмы</a>
+                <a href="#" class="nav-menu-item"><i class="fas fa-search me-3"></i>Кинотеатры</a>
+                <a href="#" class="nav-menu-item"><i class="fas fa-wrench me-3"></i>Микрозал</a>
+                <a href="#" class="nav-menu-item"><i class="fas fa-dollar-sign me-3"></i>Меню администрации</a>
+            </div>
+        </div>
+    </div>
+</header>
+
+
+<script>
+    var menuHolder = document.getElementById('menuHolder')
+var siteBrand = document.getElementById('siteBrand')
+function menuToggle(){
+  if(menuHolder.className === "drawMenu") menuHolder.className = ""
+  else menuHolder.className = "drawMenu"
+}
+</script>
+
+
+
+
+<body>
+<div class="main-container">
+
+    <div id="header">
+        <h3 th:text="'Смена c ' + ${workShift.startTime.toString.substring(0,workShift.startTime.toString.length()-2)} + ' по ' +${workShift.endTime.toString.substring(0,workShift.endTime.toString.length()-2)}"></h3>
+    </div>
+
+
+
+
+
+    <form method="post">
+    <div class="content-container"  >
+        <div   id="table-block" >
+            <div class="search-field-with-btn">
+                <input type="text" id="search-input-field" placeholder="ФИО работника">
+                <button type="button"  onclick="filterClick1()">Найти</button>
+            </div>
+            <th:block th:each = "worker : ${workers}" >
+                <div class="div-with-info" th:style="${workShift.checkContainWorkerById(worker.id) ? 'display:block; ' : 'display:none;'}" >
+                    <div  style="display: inline-block;">
+                        <div>ФИО</div>
+                        <a class="name-of-worker" th:text="${worker.firstName} + ' ' + ${worker.secondName} + ' ' + ${worker.surname}" th:href="'/worker/get/'+${worker.id}" >test test test</a>
+                        <div>Номер телефона</div>
+                        <div th:text = "${worker.phone}">sdf</div>
+                        <div>Почта</div>
+                        <div th:text = "${worker.email}">sdf</div>
+                        <div>Название кинотеатра</div>
+                        <div class="name-of-workers-cinema" th:text = "${worker.workPlace.name}">sdfsdf</div>
+                        <input type="hidden"  class="workerId" th:value="${worker.id}">
+                        <input type="hidden"  class="isInWorkShift" th:value="${workShift.checkContainWorkerById(worker.id) ? '1' : '0'}">
+                    </div>
+                    <button  type="button" style="vertical-align: top;  float:right;" th:attr="onclick=|delWorker('${worker.id}')|" >Удалить</button>
+                </div>
+            </th:block>
+        </div>
+        <div id="search-block"  >
+            <div>
+                <select id="cinemaNameSelector">
+                    <option selected="selected">-</option>
+                    <option th:each="cinema: ${cinemas}" th:text="${cinema.name}"></option>
+                </select>
+            </div>
+
+
+
+            <div class="createAccount_inner">
+                <div class="form_label">
+                    <div class="multiselect_block">
+                        <label for="addWorker" class="field_multiselect">ФИО работника</label>
+                        <input id="checkbox-1" class="multiselect_checkbox" type="checkbox">
+                        <label for="checkbox-1" class="multiselect_label"></label>
+                        <select  class="field_select" name="technology" multiple style="@media (min-width: 768px) { height: calc(4 * 38px)}" id="addWorker">
+                            <option class="workerIdes" th:each = "worker : ${workers}" th:text="${worker.firstName} + ' ' + ${worker.secondName} + ' ' + ${worker.surname}" th:style="${!workShift.checkContainWorkerById(worker.id) ? 'display:block' : 'display:none'}"></option>
+                        </select>
+                    </div>
+                    <span class="error_text"></span>
+                </div>
+            </div>
+            <button type="button" onclick="filterClick2()">Добавить</button>
+            <br>
+            <br>
+            <input  type="hidden" id="res_input" th:name="workers">
+            <button th:attr="onclick=|addWorker2()|">Сохранить</button>
+
+
+
+            <div>
+
+            </div>
+        </div>
+
+    </div>
+    </form>
+
+    <script>
+        ///////////// Multiselect field
+
+        let multiselect_block = document.querySelectorAll(".multiselect_block");
+        multiselect_block.forEach(parent => {
+            let label = parent.querySelector(".field_multiselect");
+            let select = parent.querySelector(".field_select");
+            let text = label.innerHTML;
+            select.addEventListener("change", function(element) {
+                let selectedOptions = this.selectedOptions;
+                label.innerHTML = "";
+                for (let option of selectedOptions) {
+                    let button = document.createElement("button");
+                    button.type = "button";
+                    button.className = "btn_multiselect";
+                    button.textContent = option.value;
+                    button.onclick = _ => {
+                        option.selected = false;
+                        button.remove();
+                        if (!select.selectedOptions.length) label.innerHTML = text
+                    };
+                    label.append(button);
+                }
+            })
+        })
+
+    </script>
+</div>
+
+
+<script>
+    function filterClick1() {
+      var cinemaNames = document.getElementsByClassName('name-of-workers-cinema');
+      var cinemaName = document.getElementById("cinemaNameSelector").options[document.getElementById("cinemaNameSelector").selectedIndex].text;
+
+      var searchName = document.getElementById("search-input-field").value;
+      var workersName = document.getElementsByClassName("name-of-worker");
+      var blocks = document.getElementsByClassName("div-with-info");
+
+      var isInWorkShift = document.getElementsByClassName("isInWorkShift");
+
+      console.log(workersName);
+
+      for (i = 0 ; i < blocks.length; i = i  + 1){
+          let exceptedName = new RegExp(searchName);
+          if (searchName !='' && !exceptedName.test(workersName[i].text)){
+              blocks[i].style.display  = "none";
+          }
+          else{
+            if (cinemaName !='-' && cinemaName!=cinemaNames[i].innerHTML){
+              blocks[i].style.display  = "none";
+              }
+              else{
+                  if (isInWorkShift[i].value=='1'){
+                      blocks[i].style.display  = "";
+                  }
+              }
+          }
+      }
+  }
+</script>
+
+<script>
+
+   document.getElementById("cinemaNameSelector").onchange = cinemaChangeName;
+
+  function cinemaChangeName() {
+        var cinemaNames = document.getElementsByClassName('name-of-workers-cinema');
+        var cinemaName = document.getElementById("cinemaNameSelector").options[document.getElementById("cinemaNameSelector").selectedIndex].text;
+        var blocks = document.getElementsByClassName('div-with-info');
+        var searchName = document.getElementById("search-input-field").value;
+        var workersName = document.getElementsByClassName("name-of-worker");
+
+        var isInWorkShift = document.getElementsByClassName("isInWorkShift");
+     var idesAdd = document.getElementsByClassName("workerIdes");
+
+       for (i = 0 ; i < blocks.length ; i = i + 1){
+
+
+
+           if (cinemaName !='-' && cinemaName!=cinemaNames[i].innerHTML){
+                blocks[i].style.display  = "none";
+                idesAdd[i].style.display = "none";
+           }
+           else{
+                if (isInWorkShift[i].value=='0'){
+                    idesAdd[i].style.display = "";
+                }
+                let exceptedName = new RegExp(searchName);
+                if (searchName !='' && !exceptedName.test(workersName[i].text)){
+                    blocks[i].style.display  = "none";
+                }
+                else{
+                    if (isInWorkShift[i].value =='1'){
+                        blocks[i].style.display  = "";
+                    }
+                }
+           }
+
+       }
+
+   }
+</script>
+
+<script>
+    function addWorker2(){
+     var ides= document.getElementsByClassName("workerId");
+     var res = document.getElementById("res_input");
+    var blocks = document.getElementsByClassName('div-with-info');
+    var isInWorkShift = document.getElementsByClassName("isInWorkShift");
+
+     let str = "";
+     for (i =0;i < ides.length; i = i + 1) {
+        if( isInWorkShift[i].value== '1'){
+            str = str + ides[i].value.trim() + ",";
+        }
+     }
+
+    console.log(str);
+
+     res.value = str.substring(0, str.length - 1);
+
+    }
+</script>
+
+<script>
+    function filterClick2() {
+    var blocks = document.getElementsByClassName('div-with-info');
+     var idesAll = document.getElementsByClassName("workerId");
+     var idesAdd = document.getElementsByClassName("workerIdes");
+    var isInWorkShift = document.getElementsByClassName("isInWorkShift");
+
+     for (i = 0; i < idesAdd.length; i = i + 1)
+     {
+        if(idesAdd[i].selected == true){
+            idesAdd[i].selected = false;
+            idesAdd[i].style.display = "none";
+            isInWorkShift[i].value='1';
+        }
+     }
+     let label = document.getElementsByClassName("field_multiselect")[0];
+     label.innerHTML = "";
+     cinemaChangeName();
+
+}
+</script>
+
+<script>
+    function delWorker(btn){
+
+    var blocks = document.getElementsByClassName('div-with-info');
+     var idesAll = document.getElementsByClassName("workerId");
+     var idesAdd = document.getElementsByClassName("workerIdes");
+    var isInWorkShift = document.getElementsByClassName("isInWorkShift");
+        for (i = 0; i< blocks.length; i = i + 1){
+            if (idesAll[i].value == btn){
+            blocks[i].style.display = "none";
+            isInWorkShift[i].value = '0';
+              idesAdd[i].style.display = "";
+
+            }
+        }
+
+
+        console.log(btn)
+    }
+</script>
+
+<script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+<script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+
+
+<footer class="footer">
+    <div class="waves">
+        <div class="wave" id="wave1"></div>
+        <div class="wave" id="wave2"></div>
+        <div class="wave" id="wave3"></div>
+        <div class="wave" id="wave4"></div>
+    </div>
+    <ul class="social-icon">
+        <li class="social-icon__item"><a class="social-icon__link" href="#">
+            <ion-icon name="logo-facebook"></ion-icon>
+        </a></li>
+        <li class="social-icon__item"><a class="social-icon__link" href="#">
+            <ion-icon name="logo-twitter"></ion-icon>
+        </a></li>
+        <li class="social-icon__item"><a class="social-icon__link" href="#">
+            <ion-icon name="logo-linkedin"></ion-icon>
+        </a></li>
+        <li class="social-icon__item"><a class="social-icon__link" href="#">
+            <ion-icon name="logo-instagram"></ion-icon>
+        </a></li>
+    </ul>
+    <ul class="menu">
+        <li class="menu__item"><a class="menu__link" href="/">Главная страница</a></li>
+
+    </ul>
+    <p>&copy;2024 KinoGo | All Rights Reserved</p>
+</footer>
+
+</body>
+
+
+</html>
